@@ -1,0 +1,17 @@
+{
+  "Auth": {
+    "forgot-password": "Lupa password",
+    "forgot-password-desc": "Masukkan email anda untuk mendapatkan akun anda kembali",
+    "activate": "Aktivasi akun",
+    "activate-desc": "Masukkan password baru anda untuk melakukan aktivasi akun",
+    "login": "Login",
+    "login-desc": "Masukkan username dan password anda untuk login kedalam akun",
+    "retype-password": "Masukkan ulang password",
+    "send-email": "Kirim email"
+  },
+  "Error": {
+    "regex-password": "Password harus lebih dari 12 karakter dan memiliki setidaknya 1 Huruf besar, 1 Huruf kecil, 1 karakter simbol, dan 1 angka",
+    "missmatch-password": "Kolom isi ulang password harus sama dengan kolom password",
+    "incorrect-email": "Format email tidak sesuai."
+  }
+}

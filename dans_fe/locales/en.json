@@ -1,0 +1,17 @@
+{
+  "Auth": {
+    "forgot-password": "Forgot password",
+    "forgot-password-desc": "Enter your email below to recover your account",
+    "activate": "Activate account",
+    "activate-desc": "Enter your new password below to activate your account",
+    "login": "Login",
+    "login-desc": "Enter your username and password to login to your account",
+    "retype-password": "Retype password",
+    "send-email": "Send email"
+  },
+  "Error": {
+    "regex-password": "Password must 12 characters length contain at least 1 Uppercase letter, 1 Lowercase letter, 1 symbol, and 1 number",
+    "missmatch-password": "Retype password must be the same with password field",
+    "incorrect-email": "Email format are incorrect"
+  }
+}

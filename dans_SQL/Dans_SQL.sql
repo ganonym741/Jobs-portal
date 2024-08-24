@@ -1,0 +1,150 @@
+-- Enable the pgcrypto extension for UUID generation
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Creating CUSTOMER table
+CREATE TABLE CUSTOMER (
+    CUST_ID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    CUST_FIRSTNAME VARCHAR(30) NOT NULL,
+    CUST_LASTNAME VARCHAR(30) NOT NULL,
+    CUST_BIRTHDATE DATE,
+    CUST_GENDER CHAR(1) NOT NULL CHECK (CUST_GENDER IN ('1', '2')),
+    CUST_ADDRESS VARCHAR(50),
+    CUST_CITY VARCHAR(20),
+    CUST_POSTCODE CHAR(5)
+);
+
+-- Creating ACCOUNT table
+CREATE TABLE ACCOUNT (
+    ACC_NUMBER UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    ACC_OWNER UUID NOT NULL,
+    ACC_DATE_CREATED DATE NOT NULL,
+    ACC_BALANCE DECIMAL(10, 0) NOT NULL,
+    FOREIGN KEY (ACC_OWNER) REFERENCES CUSTOMER(CUST_ID)
+);
+
+-- Creating TRANSACTION table
+CREATE TABLE TRANSACTION (
+    TRS_ID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    TRS_FROM_ACCOUNT UUID NOT NULL,
+    TRS_DATE DATE NOT NULL,
+    TRS_AMOUNT DECIMAL(10, 0) NOT NULL,
+    TRS_TYPE CHAR(2) NOT NULL CHECK (TRS_TYPE IN ('DB', 'CR', 'TF')),
+    FOREIGN KEY (TRS_FROM_ACCOUNT) REFERENCES ACCOUNT(ACC_NUMBER)
+);
+
+-- Creating TRANSACTION_TRANSFER table
+CREATE TABLE TRANSACTION_TRANSFER (
+    TRS_ID UUID PRIMARY KEY,
+    TRS_TO_ACCOUNT UUID NOT NULL,
+    TRS_STATUS CHAR(2) NOT NULL CHECK (TRS_STATUS IN ('0', '1', '-1')),
+    FOREIGN KEY (TRS_ID) REFERENCES TRANSACTION(TRS_ID),
+    FOREIGN KEY (TRS_TO_ACCOUNT) REFERENCES ACCOUNT(ACC_NUMBER)
+);
+
+-- Inserting data into CUSTOMER table
+INSERT INTO CUSTOMER (CUST_ID, CUST_FIRSTNAME, CUST_LASTNAME, CUST_BIRTHDATE, CUST_GENDER, CUST_ADDRESS, CUST_CITY, CUST_POSTCODE) VALUES
+(gen_random_uuid(), 'Gunawan', 'Prasetya', '1985-05-15', '1', 'Pancoran', 'Jakarta', '12770'),
+(gen_random_uuid(), 'John', 'Michael', '1990-08-20', '2', 'Pancoran', 'Jakarta', '12770');
+
+-- Fetching CUSTOMER IDs to use in subsequent inserts
+WITH customer_cte AS (
+    SELECT CUST_ID
+    FROM CUSTOMER
+    LIMIT 2
+)
+
+-- Inserting data into ACCOUNT table (3 accounts for each customer)
+INSERT INTO ACCOUNT (ACC_NUMBER, ACC_OWNER, ACC_DATE_CREATED, ACC_BALANCE) VALUES
+(gen_random_uuid(), (SELECT CUST_ID FROM customer_cte OFFSET 0 LIMIT 1), '2024-01-01', 24000000),
+(gen_random_uuid(), (SELECT CUST_ID FROM customer_cte OFFSET 0 LIMIT 1), '2024-01-02', 31850000),
+(gen_random_uuid(), (SELECT CUST_ID FROM customer_cte OFFSET 0 LIMIT 1), '2024-01-03', 19800000),
+(gen_random_uuid(), (SELECT CUST_ID FROM customer_cte OFFSET 1 LIMIT 1), '2024-01-04', 13000000),
+(gen_random_uuid(), (SELECT CUST_ID FROM customer_cte OFFSET 1 LIMIT 1), '2024-01-05', 23900000),
+(gen_random_uuid(), (SELECT CUST_ID FROM customer_cte OFFSET 1 LIMIT 1), '2024-01-06', 34000000);
+
+-- Fetching ACCOUNT IDs to use in subsequent inserts
+WITH account_cte AS (
+    SELECT ACC_NUMBER
+    FROM ACCOUNT
+    ORDER BY ACC_DATE_CREATED ASC
+    LIMIT 6
+)
+
+-- Inserting data into TRANSACTION table (3 transactions per account: DB, CR, TF)
+INSERT INTO TRANSACTION (TRS_ID, TRS_FROM_ACCOUNT, TRS_DATE, TRS_AMOUNT, TRS_TYPE) VALUES
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 0 LIMIT 1), '2024-02-01', 1000000, 'DB'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 0 LIMIT 1), '2024-02-02', 1500000, 'CR'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 0 LIMIT 1), '2024-02-03', 2000000, 'TF'),
+
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 1 LIMIT 1), '2024-02-04', 3000000, 'DB'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 1 LIMIT 1), '2024-02-05', 3500000, 'CR'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 1 LIMIT 1), '2024-02-06', 4000000, 'TF'),
+
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 2 LIMIT 1), '2024-02-07', 5000000, 'DB'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 2 LIMIT 1), '2024-02-08', 5500000, 'CR'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 2 LIMIT 1), '2024-02-09', 6000000, 'TF'),
+
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 3 LIMIT 1), '2024-02-10', 7000000, 'DB'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 3 LIMIT 1), '2024-02-11', 7500000, 'CR'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 3 LIMIT 1), '2024-02-12', 8000000, 'TF'),
+
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 4 LIMIT 1), '2024-02-13', 9000000, 'DB'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 4 LIMIT 1), '2024-02-14', 9500000, 'CR'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 4 LIMIT 1), '2024-02-15', 10000000, 'TF'),
+
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 5 LIMIT 1), '2024-02-16', 11000000, 'DB'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 5 LIMIT 1), '2024-02-17', 11500000, 'CR'),
+(gen_random_uuid(), (SELECT ACC_NUMBER FROM account_cte OFFSET 5 LIMIT 1), '2024-02-18', 12000000, 'TF');
+
+-- Fetching TRANSACTION IDs and ACC NUMBER for 'TF' transactions to use in TRANSACTION_TRANSFER inserts
+WITH transaction_cte AS (
+    SELECT TRS_ID, TRS_FROM_ACCOUNT
+    FROM TRANSACTION
+    WHERE TRS_TYPE = 'TF'
+    ORDER BY TRS_DATE ASC
+    LIMIT 6
+),
+account_cte AS (
+    SELECT ACC_NUMBER
+    FROM ACCOUNT
+    ORDER BY ACC_DATE_CREATED ASC
+    LIMIT 6
+)
+
+-- Inserting data into TRANSACTION_TRANSFER table for 'TF' transactions
+INSERT INTO TRANSACTION_TRANSFER (TRS_ID, TRS_TO_ACCOUNT, TRS_STATUS) VALUES
+((SELECT TRS_ID FROM transaction_cte OFFSET 0 LIMIT 1), (SELECT ACC_NUMBER FROM account_cte WHERE ACC_NUMBER <> (SELECT TRS_FROM_ACCOUNT FROM transaction_cte OFFSET 0 LIMIT 1) OFFSET 0 LIMIT 1), '1'),
+((SELECT TRS_ID FROM transaction_cte OFFSET 1 LIMIT 1), (SELECT ACC_NUMBER FROM account_cte WHERE ACC_NUMBER <> (SELECT TRS_FROM_ACCOUNT FROM transaction_cte OFFSET 1 LIMIT 1) OFFSET 0 LIMIT 1), '0'),
+((SELECT TRS_ID FROM transaction_cte OFFSET 2 LIMIT 1), (SELECT ACC_NUMBER FROM account_cte WHERE ACC_NUMBER <> (SELECT TRS_FROM_ACCOUNT FROM transaction_cte OFFSET 2 LIMIT 1) OFFSET 0 LIMIT 1), '-1'),
+((SELECT TRS_ID FROM transaction_cte OFFSET 3 LIMIT 1), (SELECT ACC_NUMBER FROM account_cte WHERE ACC_NUMBER <> (SELECT TRS_FROM_ACCOUNT FROM transaction_cte OFFSET 3 LIMIT 1) OFFSET 0 LIMIT 1), '1'),
+((SELECT TRS_ID FROM transaction_cte OFFSET 4 LIMIT 1), (SELECT ACC_NUMBER FROM account_cte WHERE ACC_NUMBER <> (SELECT TRS_FROM_ACCOUNT FROM transaction_cte OFFSET 4 LIMIT 1) OFFSET 0 LIMIT 1), '0'),
+((SELECT TRS_ID FROM transaction_cte OFFSET 5 LIMIT 1), (SELECT ACC_NUMBER FROM account_cte WHERE ACC_NUMBER <> (SELECT TRS_FROM_ACCOUNT FROM transaction_cte OFFSET 5 LIMIT 1) OFFSET 0 LIMIT 1), '-1');
+
+
+-- Response of Dans multipro test 1: Recapitulation of number of accounts owned by every customer.
+SELECT 
+	c.CUST_ID, 
+	c.CUST_FIRSTNAME, 
+	c.CUST_LASTNAME, 
+	COUNT(*) AS COUNT_OF_ACCOUNT 
+FROM CUSTOMER AS c 
+LEFT JOIN ACCOUNT AS a 
+ON c.CUST_ID = a.ACC_OWNER 
+GROUP BY c.CUST_ID, c.CUST_FIRSTNAME, c.CUST_LASTNAME
+
+
+-- Response of Dans multipro test 2: All transactions created by John Michael sorted by account number and transaction date
+SELECT 
+	c.CUST_FIRSTNAME, 
+	c.CUST_LASTNAME, 
+	t.* 
+FROM "TRANSACTION" AS t
+RIGHT JOIN ACCOUNT AS a 
+ON t.TRS_FROM_ACCOUNT = a.ACC_NUMBER 
+RIGHT JOIN CUSTOMER AS c 
+ON a.ACC_OWNER = c.CUST_ID 
+WHERE c.CUST_FIRSTNAME = 'John'
+	AND c.CUST_LASTNAME = 'Michael'
+ORDER BY t.TRS_FROM_ACCOUNT 
+
+

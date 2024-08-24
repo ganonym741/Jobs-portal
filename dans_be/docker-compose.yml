@@ -1,0 +1,65 @@
+version: '3.8'
+
+x-api-common:
+  &api-common
+  environment:
+    &api-common-env
+    TZ: Asia/Jakarta
+    NODE: development
+    PORT: 3010
+    JWT_SECRET_SALT: 0xd9a74074D0a8f4bF5aeA4aB4E1Ab87efbeafBDed
+    JWT_MAX_AGE: 900
+    DECRYPT_SECRET_KEY: 0123456789abcdef0123456789abcdef
+    DECRYPT_IV: abcdef9876543210abcdef9876543210
+    JWTR_SECRET: JKeqoi*&sa
+    REDIS_HOST: cache-redis
+    REDIS_PORT: 6379
+    POSTGRES_HOST: api-database
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: pass123
+    POSTGRES_DATABASE: postgres
+    RUN_MIGRATIONS: false
+
+services:
+  api-service:
+    container_name: api-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - '3010:3010'
+    environment:
+      <<: *api-common-env
+    depends_on:
+      api-database:
+        condition: service_healthy
+      cache-redis:
+        condition: service_healthy
+
+  api-database:
+    container_name: api-database
+    image: postgres:13
+    ports:
+      - '5432:5432'
+    environment:
+      <<: *api-common-env
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  cache-redis:
+    container_name: cache-redis
+    image: redis:7.2-bookworm
+    ports:
+      - '6379:6379'
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
