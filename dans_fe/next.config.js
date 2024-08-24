@@ -3,6 +3,7 @@
 const withNextIntl = require("next-intl/plugin")();
 
 const nextConfig = {
+  output: 'standalone',
   images: {
     unoptimized: true,
   },
@@ -13,7 +14,7 @@ const nextConfig = {
         destination: '/jobs',
         permanent: true,
       },
-    ]
+    ];
   },
 };
 
