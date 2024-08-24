@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import { flexRender, type Table as TanstackTable } from '@tanstack/react-table';
 
+import { Loader } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 import {
   Table,
@@ -12,10 +14,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { DataTablePagination } from '@/components/data-table/data-table-pagination';
-import { Loader } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 
 interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
+
   /**
    * The table instance returned from useDataTable hook with pagination, sorting, filtering, etc.
    * @type TanstackTable<TData>

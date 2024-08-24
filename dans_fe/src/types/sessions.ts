@@ -1,13 +1,11 @@
 import type { SessionOptions } from 'iron-session';
 
 import type { User } from '@/query/dto/user.dto';
+import type { TokenDto } from '@/query/dto/auth.dto';
 
 export interface SessionData {
   user: User;
-  jwt: {
-    token: string;
-    token_expired: string;
-  };
+  jwt: TokenDto;
 }
 
 export const sessionOptions: SessionOptions = {

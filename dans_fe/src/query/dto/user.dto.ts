@@ -7,17 +7,17 @@ export enum GENDER {
 
 export interface User {
   id?: string;
-  name: string;
-  email: string;
-  username: string;
-  password: string;
-  birth_date: Date;
-  gender: GENDER;
-  address: string;
-  city: string;
-  province: string;
+  name?: string;
+  email?: string;
+  username?: string;
+  password?: string;
+  birth_date?: Date;
+  gender?: GENDER;
+  address?: string;
+  city?: string;
+  province?: string;
   profile_desc?: string;
-  phone_number: string;
+  phone_number?: string;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
