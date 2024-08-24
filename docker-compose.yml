@@ -25,8 +25,8 @@ services:
   dans_fe:
     container_name: dans_fe
     build:
-      context: .
-      dockerfile: dans_fe/Dockerfile
+      context: dans_fe
+      dockerfile: Dockerfile
     restart: on-failure
     environment:
       NEXT_PUBLIC_BACKEND_URL: dans_be
@@ -41,8 +41,8 @@ services:
   dans_be:
     container_name: dans_be
     build:
-      context: .
-      dockerfile: dans_be/Dockerfile
+      context: dans_be
+      dockerfile: Dockerfile
     restart: on-failure
     ports:
       - '3010:3010'
