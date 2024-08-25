@@ -73,18 +73,20 @@ Frontend:
   $ docker compose up --build
 ```
 
+Note: make sure you don't have port 3010/3011/6379/5432 run on your docker machine, or you can change those port on on docker-compose and Dockerfile
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Utilities
 
 **1. API List.**
-You need to run the service first then access its host:port/docs
+You need to run the service first then access its be_host:port/docs
 
-**2. Encryption Ready.**
-Uncomment Interceptor Request and/or Response in src/app.module.ts
-
-**3. SQL Logging.**
+**2. SQL Logging.**
 as it was running on development the log will appear, deactivate it at src/@core/config/config.service.ts on getTypeOrmConfig function, disable logging value.
+
+**3. Auto Migrate & Seeding ready.**
+Auto migrate and seeding auto generate on program start, if auto migrating not firing you can run manually by run command ```npm run migration:generate && npm run migration:run``` then run the application for seeding with user data.
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -144,7 +146,8 @@ Backend:
 ```
 
 
-Frontemd:
+Frontend:
+```graphql
 ├───app
 │   └───[locale]
 │       ├───(auth)
@@ -172,3 +175,4 @@ Frontemd:
 │   ├───query
 │   └───service
 └───types
+```
