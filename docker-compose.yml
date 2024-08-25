@@ -12,13 +12,14 @@ x-api-common:
     DECRYPT_SECRET_KEY: 0123456789abcdef0123456789abcdef
     DECRYPT_IV: abcdef9876543210abcdef9876543210
     JWTR_SECRET: JKeqoi*&sa
-    REDIS_HOST: cache-redis
+    REDIS_HOST: dans_redis
     REDIS_PORT: 6379
-    POSTGRES_HOST: api-database
+    POSTGRES_HOST: dans_database
     POSTGRES_PORT: 5432
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: pass123
     POSTGRES_DATABASE: postgres
+    POSTGRES_SCHEMA: public
     RUN_MIGRATIONS: false
 
 services:
@@ -29,14 +30,13 @@ services:
       dockerfile: Dockerfile
     restart: on-failure
     environment:
-      NEXT_PUBLIC_BACKEND_URL: dans_be
+      NEXT_PUBLIC_BACKEND_URL: 'dans_be:33010/api/v1'
       SECRET_KEY: KZkwdyKQJwFx7idL6FpN88SSEN0VTXdJQxx8t6nEsHM=
       PORT: 3011
     ports:
       - '3011:3011'
     depends_on:
-      dans_be:
-        condition: service_healthy
+      - dans_be
 
   dans_be:
     container_name: dans_be
@@ -49,13 +49,13 @@ services:
     environment:
       <<: *api-common-env
     depends_on:
-      api-database:
+      dans_database:
         condition: service_healthy
-      cache-redis:
+      dans_redis:
         condition: service_healthy
 
-  api-database:
-    container_name: api-database
+  dans_database:
+    container_name: dans_database
     image: postgres:13
     ports:
       - '5432:5432'
@@ -68,8 +68,8 @@ services:
       timeout: 5s
       retries: 5
 
-  cache-redis:
-    container_name: cache-redis
+  dans_redis:
+    container_name: dans_redis
     image: redis:7.2-bookworm
     ports:
       - '6379:6379'
